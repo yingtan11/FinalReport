@@ -1,0 +1,6 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% GLOSSARY
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\newabbreviation[category=acronym]{SOC}{soc}{self-organized criticality}
+\newabbreviation[category=acronym]{BTW}{btw}{Bank--Tang--Wiesenfeld}
