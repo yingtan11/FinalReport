@@ -38,7 +38,7 @@ def example_plotting(output_dir):
     # axes; however, it can fail sometimes.  This allows you to set them
     # manually.
     ax.set_ylim([-0.5, 1.1])
-    fig.savefig("output/example.pdf")
+    fig.savefig(output_dir / "example.pdf")
     pyplot.close(fig)
 
     # Now for the histogram.  We generate some random data
@@ -48,7 +48,7 @@ def example_plotting(output_dir):
     ax.set_title("Histogram of random data")
     ax.set_xlabel("Value")
     ax.set_ylabel("Frequency")
-    fig.savefig("output/example_histogram.pdf")
+    fig.savefig(output_dir / "example_histogram.pdf")
     pyplot.close(fig)
 
     # In this lab, you'll also want to show what the grid looks like.  This can
@@ -57,17 +57,33 @@ def example_plotting(output_dir):
     fig, ax = pyplot.subplots()
     ax.imshow(data)
     ax.set_title("Grid plot")
-    fig.savefig("output/example_grid.pdf")
+    fig.savefig(output_dir / "example_grid.pdf")
     pyplot.close(fig)
 
 
 def main():
     # Make sure that the output/ directory exists, or create it otherwise.
-    output_dir = Path.cwd() / "output"
+    output_dir = Path(__file__).parent / "output"
     if not output_dir.is_dir():
         output_dir.mkdir()
 
     example_plotting(output_dir)
+
+    pile = SandPile(3, 3)
+    print(pile.grid)
+    print(pile.mass())
+
+    # figure 3
+    pile.grid[0, 0] = pile.grid[2, 1] = pile.grid[2, 2] = 1
+    pile.grid[1, 0] = pile.grid[1, 2] = pile.grid[2, 0] = 2
+    pile.grid[0, 1] = pile.grid[0, 2] = 3
+    pile.grid[1, 1] = 4
+    print(pile.grid)
+    print(pile.mass())
+
+    pile.avalanche(None)
+    print(pile.grid)
+    print(pile.mass_history)
 
 
 

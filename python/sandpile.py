@@ -95,18 +95,3 @@ class SandPile:
 
     # You are free (and encouraged) to define more methods within this class
 
-pile = SandPile(3, 3)
-print(pile.grid)
-print(pile.mass())
-
-# figure 3
-pile.grid[0, 0] = pile.grid[2, 1] = pile.grid[2, 2] = 1
-pile.grid[1, 0] = pile.grid[1, 2] = pile.grid[2, 0] = 2
-pile.grid[0, 1] = pile.grid[0, 2] = 3
-pile.grid[1, 1] = 4
-print(pile.grid)
-print(pile.mass())
-
-pile.avalanche(None)
-print(pile.grid)
-print(pile.mass_history)
