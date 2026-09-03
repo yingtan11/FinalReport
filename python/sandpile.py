@@ -56,7 +56,7 @@ class SandPile:
         y = site[1]
         self.grid[x][y] += n
 
-        self.mass_history.append(self.mass(self))
+        self.mass_history.append(self.mass())
 
 
     def mass(self):
@@ -65,16 +65,48 @@ class SandPile:
 
     def topple(self, site):
         """Topple the specified site."""
-        raise NotImplementedError()
+        x, y = site
+        self.grid[x][y] -= 4
+        if x+1 < self.width:
+            self.grid[x+1][y] += 1
+        if x-1 >= 0:    
+            self.grid[x-1][y] += 1
+        if y+1 < self.height:
+            self.grid[x][y+1] += 1
+        if y-1 >=0:
+            self.grid[x][y-1] += 1
 
     def avalanche(self, start):
         """Run the avalanche causing all sites to topple and store the stats of
         the avalanche in the appropriate variables.
         """
-
+        to_topple = []
         # checks first
+        for x in range(self.width):
+            for y in range(self.height):
+                if self.grid[x, y] >= self.threshold:
+                    to_topple.append((x, y))
+
         # cause avalanche
-        raise NotImplementedError()
+        for site in to_topple:
+            self.topple(site)
+            print(self.grid)
+            self.avalanche(start)
 
     # You are free (and encouraged) to define more methods within this class
 
+pile = SandPile(3, 3)
+print(pile.grid)
+print(pile.mass())
+
+# figure 3
+pile.grid[0, 0] = pile.grid[2, 1] = pile.grid[2, 2] = 1
+pile.grid[1, 0] = pile.grid[1, 2] = pile.grid[2, 0] = 2
+pile.grid[0, 1] = pile.grid[0, 2] = 3
+pile.grid[1, 1] = 4
+print(pile.grid)
+print(pile.mass())
+
+pile.avalanche(None)
+print(pile.grid)
+print(pile.mass_history)
