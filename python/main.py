@@ -61,13 +61,42 @@ def example_plotting(output_dir):
     pyplot.close(fig)
 
 
+def plot_one_grid(output_dir, data, i=None):
+    fig, ax = pyplot.subplots()
+    ax.imshow(data, vmin=0, vmax=5)
+    ax.set_title("Grid plot")
+
+    for r in range(data.shape[0]):
+        for c in range(data.shape[1]):
+            val = data[r, c]
+            ax.text(c, r, f"{val}", ha="center", va="center", color="white", fontname="Times New Roman", fontsize=33)
+
+    if i is None:
+        fig.savefig(output_dir / f"one_grid.pdf")
+    else: 
+        fig.savefig(output_dir / f"avalanche{i}.pdf")
+    pyplot.close(fig)
+
+def plot_avalanche(output_dir, grid_history):
+    for i, grid in enumerate(grid_history):
+        plot_one_grid(output_dir, grid, i)
+
+def simulate_avalanche(T, width=3, height=3, start_sites=None):
+    pile = SandPile(width, height)
+    results = []
+
+    for t in range(T):
+        start = pile.drop_sand()
+        stat = pile.avalanche(start)
+        results.append(stat)
+
 def main():
     # Make sure that the output/ directory exists, or create it otherwise.
     output_dir = Path(__file__).parent / "output"
     if not output_dir.is_dir():
         output_dir.mkdir()
 
-    example_plotting(output_dir)
+    #example_plotting(output_dir)
 
     pile = SandPile(3, 3)
     print(pile.grid)
@@ -81,11 +110,16 @@ def main():
     print(pile.grid)
     print(pile.mass())
 
-    pile.avalanche(None)
+    pile.avalanche((1,1), record_history = True)
+    print(pile.grid_history)
     print(pile.grid)
     print(pile.mass_history)
 
+    #plot_avalanche(output_dir, grids)
 
+    #plot_one_grid(output_dir, pile.grid)
+
+    #plot_avalanche(output_dir, pile.grid_history)
 
 if __name__ == "__main__":
     main()

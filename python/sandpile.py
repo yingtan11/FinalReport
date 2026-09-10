@@ -24,6 +24,7 @@ class SandPile:
         # It is good practice to define *all* class attributes in the
         # `__init__` function, even if they get redefined later.  You may want
         # to define variables which are used to keep track of avalanches.
+        self.grid_history = []
 
     def drop_sand(self, n=1, site=None):
         """Add `n` grains of sand to the grid.  Each grains of sand is added to
@@ -58,6 +59,8 @@ class SandPile:
 
         self.mass_history.append(self.mass())
 
+        return site
+
 
     def mass(self):
         """Return the mass of the grid."""
@@ -67,31 +70,72 @@ class SandPile:
         """Topple the specified site."""
         x, y = site
         self.grid[x][y] -= 4
+        loss = 4
+
         if x+1 < self.width:
             self.grid[x+1][y] += 1
+            loss -= 1
         if x-1 >= 0:    
             self.grid[x-1][y] += 1
+            loss -= 1
         if y+1 < self.height:
             self.grid[x][y+1] += 1
+            loss -= 1
         if y-1 >=0:
             self.grid[x][y-1] += 1
+            loss -= 1
 
-    def avalanche(self, start):
+        return loss
+
+        
+
+    def avalanche(self, start, record_history = False):
         """Run the avalanche causing all sites to topple and store the stats of
         the avalanche in the appropriate variables.
         """
-        to_topple = []
-        # checks first
-        for x in range(self.width):
-            for y in range(self.height):
-                if self.grid[x, y] >= self.threshold:
-                    to_topple.append((x, y))
+        
+        topples = 0
+        toppled_sites = set()
+        loss = 0
+        length = 0
 
-        # cause avalanche
-        for site in to_topple:
-            self.topple(site)
-            print(self.grid)
-            self.avalanche(start)
+        # record starting point of an avalance
+        if record_history:
+            self.grid_history = [self.grid.copy()]
+
+        while True:
+            to_topple = []
+
+            # checks first
+            for x in range(self.width):
+                for y in range(self.height):
+                    if self.grid[x, y] >= self.threshold:
+                        to_topple.append((x, y))
+
+            # if nothing to topple
+            if len(to_topple) == 0:
+                break
+
+            # else cause avalanche
+            for site in to_topple:
+                loss += self.topple(site)
+                topples += 1
+                toppled_sites.add(site)
+
+                if record_history:
+                    self.grid_history.append(self.grid.copy()) # records grids over time in a avalanche
+
+        area = len(toppled_sites)
+
+        if area != 0:
+            x0, y0 = start
+            lengths = []
+            for x, y in toppled_sites:
+                # L1 length
+                lengths.append(abs(x-x0)+abs(y-y0)) 
+        length = max(lengths)
+
+        return topples, area, loss, length
 
     # You are free (and encouraged) to define more methods within this class
 
