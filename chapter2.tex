@@ -4,7 +4,7 @@
 %L values, T, burn-in, random seeds, open boundaries
 %BTW and Manna implementation
 
-Both models were simulated on an $L \times L$ square lattice with open boundaries. At each time step, one grain was added to a uniformly selected site using the \texttt{drop\_sand} function, after which the system was relaxed completely (no unstable sites) before the next grain was added. We follow the toppling rules discussed in the previous Chapter, and any sand units directed outside the open boundary is lost from the system.\\
+Both models were simulated on an $L \times L$ square lattice with open boundaries. At each time step, one grain was added to a uniformly selected site using the \texttt{drop\_sand} function, after which the system was toppled completely (no unstable sites) before the next grain was added. We follow the toppling rules discussed in the previous Chapter, and any sand units directed outside the open boundary is lost from the system.\\
 
 Simulations were performed for $L\in\{10,20,30,40,50\}$. This allows us to investigate the effect of system size on distributions of avalanche properties, while keeping the runtime manageable for easy replicability. Although larger lattices would provide stronger evidence especially concerning the FSS behaviour, the Manna simulations became substantially more computationally expensive as $L$ increased. The upper system size was therefore set to $L=50$.\\
 
@@ -38,7 +38,7 @@ Therefore, the burn-in period were selected conservatively using the results for
 
 The simulations and statistical analyses were implemented in Python and are provided in the submitted Jupyter notebook. Each sand pile was represented by an $L\times L$ integer-valued NumPy array. NumPy was used for numerical operations and pseudorandom number generation, Sklearn for computing $R^2$, Pandas for correlation, and Matplotlib for visualisation. A fixed random seed \texttt{12345} was used to make the simulations reproducible.\\
 
-To perform an avalanche, an initial implementation searched the full lattice for unstable sites. However, this $O(L^2)$ algorithm became very computational expensive especially for larger $L$ values. Hence this was later replaced using a first-in, first-out queue with Python's \texttt{collections.deque}, which supports append and removal operations from either end in approximately constant time \cite{PythonDeque}. Only sites whose heights could have changed were added to the queue, avoiding repeated full-lattice searches and improving the efficiency of the simulation.
+To perform an avalanche, an initial implementation searched the full lattice for unstable sites. However, this $O(L^2)$ algorithm became very computational expensive especially for larger $L$ values. Hence this was later replaced using a first-in, first-out queue with Python's \texttt{collections.deque}, which supports append and removal operations in approximately $O(1)$ \cite{PythonDeque}. Only sites whose heights could have changed were added to the queue, avoiding repeated full-lattice searches and improving the efficiency of the simulation.
 
 \section{Avalanche properties}\label{sec:properties}
 %Topples, Area, Loss and Length
@@ -71,7 +71,7 @@ For visual clarity when comparing across different system sizes, the empirical d
 \section{Power law fitting}\label{sec:powerlaw}
 
 % survival function, cutoff selection
-Throughout this report, $\log$ denotes the natural log. To identify an approximate power-law region, we first calculate the survival function $S(x)=P(X<x)$. This is smoother than our empirical PMF, making the departure from an approximately straight region easier to identify . For each candidate upper cutoff, a straight line was fitted to $\log S(x)$ against $\log x$ using observations up to that cutoff. The largest candidate satisfying the chosen $R^2$ threshold was selected. We used $R^2 \geq 0.95$ for topples and area and $R^2 \geq 0.88$ for length. The threshold was lowered for length since no for practical purposes and will be later discussed in Chapter \ref{ch:discussion}. These thresholds only serves as practical criteria for identifying approximately linear regions of a power-law distribution.\\
+Throughout this report, $\log$ denotes the natural log. To identify an approximate power-law region, we first calculate the survival function $S(x)=P(X\geq x)$. This is smoother than our empirical PMF, making the departure from an approximately straight region easier to identify. For each candidate upper cutoff, a straight line was fitted to $\log S(x)$ against $\log x$ using observations up to that cutoff. The largest candidate satisfying the chosen $R^2$ threshold was selected. We used $R^2 \geq 0.95$ for topples and area and $R^2 \geq 0.88$ for length. The threshold was lowered for length to ensure the selected fitting region contained enough points. These thresholds only serves as practical criteria for identifying approximately linear regions of a power-law distribution.\\
 
 %raw pmf fitting region, collapse, common exponent across L
 Theoretically, for an untruncated power law, we have,
@@ -86,7 +86,7 @@ Nevertheless, in our finite system, the survival function may deviate from this 
 
 After cutoff selection, a common exponent was estimated directly from the unbinned empirical PMF values within the selected scaling regions. Values from all system sizes were pooled and fitted by ordinary least squares (OLS) in log-log space:
 \[
-\log P(x) = -\tau \log(x)+C
+\log P(x) = -\tau_x \log(x)+C
 \]
 This produced a common exponent $\tau$ describing the family of finite size distributions. For the Manna model, values below the first non-plateau log bin were excluded as a lower cutoff. Nevertheless, note that the estimated exponent remains sensitive to the selected upper cutoff. If the cutoff extends into the sparse finite-size tail, tail observations can influence the fitted slope. This limitation will be discussed further in Chapter~\ref{ch:discussion}.\\
 
@@ -97,7 +97,7 @@ To investigate the log finite size correction as proposed by Yadav et al.  \cite
 \]
 A new common fit was then calculated, $\tau'$:
 \[
- \log (\log (N)P(x))= -\tau' \log(x)+C'
+ \log (\log (N)P(x))= -\tau_x' \log(x)+C'
 \]
 The quality of the common collapse was compared before and after
 rescaling using the overall RMSE and maximum residual in log scale. Smaller values indicate that the curves agree closer to their common fitted line.
